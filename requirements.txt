@@ -1,0 +1,7 @@
+# requirements.txt
+Flask
+feedparser
+sumy
+rake-nltk
+nltk==3.8.1
+numpy

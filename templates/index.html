@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI News Summary</title>
+</head>
+<body>
+    <h1>AI News Summary & Trend Tracker</h1>
+
+    <form method="post">
+        <label for="keyword">Enter keyword:</label>
+        <input type="text" name="keyword" id="keyword" required>
+        <input type="submit" value="Search">
+    </form>
+
+    {% if keyword %}
+        <h2>Results for "{{ keyword }}"</h2>
+    {% endif %}
+
+    {% if articles %}
+        {% for article, summary, tags in zip(articles, summaries, tags_list) %}
+            <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+                <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
+                <p><strong>Summary:</strong> {{ summary }}</p>
+                <p><strong>Tags:</strong> {{ tags | join(', ') }}</p>
+            </div>
+        {% endfor %}
+    {% elif keyword %}
+        <p>No articles found for "{{ keyword }}"</p>
+    {% endif %}
+</body>
+</html>
