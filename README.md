@@ -1,16 +1,15 @@
-# AI News Summary & Trend Tracker
+# AI News Summary Flask App
 
-This project fetches real-time news using RSS feeds, summarizes them using AI (Sumy), and extracts trending keywords. Built with Streamlit.
+This Flask-based project fetches RSS feeds, summarizes articles using NLP, and extracts trending keywords.
 
 ## Features
-- Topic filter
-- Real-time RSS feed parsing
-- Extractive summarization (offline)
-- Trending keywords
-- Free and fully offline
 
-## Setup
-```
-pip install -r requirements.txt
-streamlit run app.py
-```
+- Fetch news from RSS feeds
+- Summarize using NLTK + Sumy
+- Extract keywords using Rake
+- Display summaries on a web interface
+
+## Run Locally
+
+```bash
+python app.py
