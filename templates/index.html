@@ -20,8 +20,21 @@
         {% for article, summary, tags in zip(articles, summaries, tags_list) %}
             <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
                 <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
-                <p><strong>Summary:</strong> {{ summary }}</p>
-                <p><strong>Tags:</strong> {{ tags | join(', ') }}</p>
+                {% if summary %}
+                    <p><strong>Summary:</strong> {{ summary }}</p>
+                {% else %}
+                    <p><strong>Summary:</strong> No summary available.</p>
+                {% endif %}
+
+                <!-- <p><strong>Tags:</strong> {{ tags | join(', ') }}</p> -->
+                <p><strong>Tags:</strong>
+                    {% if article.tags %}
+                        {{ article.tags | join(", ") }}
+                    {% else %}
+                        No tags available.
+                    {% endif %}
+                </p>
+
             </div>
         {% endfor %}
     {% elif keyword %}
