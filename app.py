@@ -3,21 +3,35 @@ from rss_reader import fetch_filtered_articles
 from summarizer import summarize_text
 from trending import extract_keywords
 import nltk
+from nltk.corpus import stopwords
 
 app = Flask(__name__)
-nltk.download('stopwords')
+
+# Only download once
+try:
+    stopwords.words('english')
+except LookupError:
+    nltk.download('stopwords')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    keyword = None
+    mode = "all"
+    selected_keywords = []
     articles = []
     summaries = []
     tags_list = []
 
     if request.method == 'POST':
-        keyword = request.form['keyword'].strip().lower()
+        mode = request.form.get('mode', 'all')
+        if mode == 'keyword':
+            selected_keywords = request.form.getlist('keywords')
 
-    articles = fetch_filtered_articles(keyword)
+    # fetch articles
+    if mode == 'all':
+        articles = fetch_filtered_articles()
+    else:
+        articles = fetch_filtered_articles(selected_keywords)
 
     for article in articles:
         summary = summarize_text(article['summary'])
@@ -25,14 +39,14 @@ def index():
         summaries.append(summary)
         tags_list.append(tags)
 
-    # return render_template('index.html', articles=articles, summaries=summaries, tags_list=tags_list, keyword=keyword)
     return render_template(
         'index.html',
         articles=articles,
         summaries=summaries,
         tags_list=tags_list,
-        keyword=keyword,
-        zip=zip  # 👈 Add this line
+        mode=mode,
+        selected_keywords=selected_keywords,
+        zip=zip
     )
 
 

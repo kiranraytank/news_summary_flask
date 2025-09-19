@@ -1,44 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Raytik News Summary</title>
+    <title>Raytik News Summary & Trend Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        .matched {
+            background-color: #ffd700;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-right: 3px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Raytik News Summary & Trend Tracker</h1>
+<h1>Raytik News Summary & Trend Tracker</h1>
 
-    <form method="post">
-        <label for="keyword">Enter keyword:</label>
-        <input type="text" name="keyword" id="keyword" required>
-        <input type="submit" value="Search">
-    </form>
+<form method="post">
+    <label>
+        <input type="radio" name="mode" value="all" {% if mode=="all" %}checked{% endif %}> Simple News (all)
+    </label>
+    <label>
+        <input type="radio" name="mode" value="keyword" {% if mode=="keyword" %}checked{% endif %}> Keyword-Specific News
+    </label>
 
-    {% if keyword %}
-        <h2>Results for "{{ keyword }}"</h2>
-    {% endif %}
+    <br><br>
+    <select id="keywords" name="keywords" multiple="multiple" style="width:50%;" {% if mode!="keyword" %}disabled{% endif %}>
+        <option value="sports" {% if 'sports' in selected_keywords %}selected{% endif %}>Sports</option>
+        <option value="politics" {% if 'politics' in selected_keywords %}selected{% endif %}>Politics</option>
+        <option value="technology" {% if 'technology' in selected_keywords %}selected{% endif %}>Technology</option>
+        <option value="health" {% if 'health' in selected_keywords %}selected{% endif %}>Health</option>
+        <option value="business" {% if 'business' in selected_keywords %}selected{% endif %}>Business</option>
+        <option value="entertainment" {% if 'entertainment' in selected_keywords %}selected{% endif %}>Entertainment</option>
+    </select>
 
-    {% if articles %}
-        {% for article, summary, tags in zip(articles, summaries, tags_list) %}
-            <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-                <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
-                {% if summary %}
-                    <p><strong>Summary:</strong> {{ summary }}</p>
-                {% else %}
-                    <p><strong>Summary:</strong> No summary available.</p>
-                {% endif %}
+    <br><br>
+    <button type="submit">Search</button>
+</form>
 
-                <!-- <p><strong>Tags:</strong> {{ tags | join(', ') }}</p> -->
-                <p><strong>Tags:</strong>
-                    {% if article.tags %}
-                        {{ article.tags | join(", ") }}
+<hr>
+
+{% if articles %}
+    {% for article, summary, tags in zip(articles, summaries, tags_list) %}
+        <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+            <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
+            <p><strong>Summary:</strong> {{ summary }}</p>
+
+            <p><strong>Tags:</strong>
+                {% for tag in article.tags %}
+                    {% if tag.lower() in article.matched_keywords %}
+                        <span class="matched">{{ tag }}</span>
                     {% else %}
-                        No tags available.
+                        {{ tag }}
                     {% endif %}
-                </p>
+                {% endfor %}
+            </p>
 
-            </div>
-        {% endfor %}
-    {% elif keyword %}
-        <p>No articles found for "{{ keyword }}"</p>
-    {% endif %}
+            {% if article.matched_keywords %}
+                <p><strong>Matched Keywords:</strong>
+                    {% for kw in article.matched_keywords %}
+                        <span class="matched">{{ kw }}</span>
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% elif mode=="keyword" %}
+    <p>No articles found for selected keywords: {{ selected_keywords | join(", ") }}</p>
+{% else %}
+    <p>No articles found.</p>
+{% endif %}
+
+<script>
+$(document).ready(function() {
+    $('#keywords').select2({
+        placeholder: "Select keywords...",
+        allowClear: true
+    });
+
+    $('input[name="mode"]').change(function(){
+        if($(this).val() == 'keyword'){
+            $('#keywords').prop('disabled', false);
+        } else {
+            $('#keywords').val(null).trigger('change');
+            $('#keywords').prop('disabled', true);
+        }
+    });
+});
+</script>
 </body>
 </html>

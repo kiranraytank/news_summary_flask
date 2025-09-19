@@ -1,7 +1,13 @@
 import nltk
 from rake_nltk import Rake
+from nltk.corpus import stopwords
 
-nltk.download('stopwords')
+# Only download once if missing
+try:
+    stopwords.words('english')
+except LookupError:
+    nltk.download('stopwords')
+
 
 def extract_keywords(text, max_words=5):
     rake = Rake()
