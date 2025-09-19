@@ -12,6 +12,20 @@
             border-radius: 3px;
             margin-right: 3px;
         }
+        .pagination {
+            margin-top: 20px;
+        }
+        .pagination a {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+            text-decoration: none;
+            color: #333;
+        }
+        .pagination a.current {
+            background-color: #007bff;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +59,7 @@
     {% for article, summary, tags in zip(articles, summaries, tags_list) %}
         <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
             <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
-            <p><strong>Summary:</strong> {{ summary }}</p>
+            <p><strong>Summary:</strong> {{ summary | safe }}</p>
 
             <p><strong>Tags:</strong>
                 {% for tag in article.tags %}
@@ -66,6 +80,48 @@
             {% endif %}
         </div>
     {% endfor %}
+
+    <!-- pagination -->
+    {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="?page={{ page-1 }}&mode={{ mode }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}">&laquo; Prev</a>
+            {% endif %}
+
+            {% set displayed_pages = [] %}
+            {% if total_pages <= 5 %}
+                {% set displayed_pages = range(1, total_pages + 1) %}
+            {% else %}
+                {% set displayed_pages = [1,2] %}
+                {% if page > 3 and page < total_pages-2 %}
+                    {% set displayed_pages = displayed_pages + [page-1, page, page+1] %}
+                {% elif page >= total_pages-2 %}
+                    {% set displayed_pages = displayed_pages + [total_pages-3, total_pages-2, total_pages-1] %}
+                {% endif %}
+                {% set displayed_pages = displayed_pages + [total_pages] %}
+                {% set displayed_pages = displayed_pages | unique %}
+            {% endif %}
+
+            {% set last_page = 0 %}
+            {% for p in displayed_pages %}
+                {% if p - last_page > 1 %}
+                    ...
+                {% endif %}
+                <a href="?page={{ p }}&mode={{ mode }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}"
+                {% if p == page %} class="current"{% endif %}>
+                    {{ p }}
+                </a>
+                {% set last_page = p %}
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <a href="?page={{ page+1 }}&mode={{ mode }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}">Next &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+
 {% elif mode=="keyword" %}
     <p>No articles found for selected keywords: {{ selected_keywords | join(", ") }}</p>
 {% else %}
