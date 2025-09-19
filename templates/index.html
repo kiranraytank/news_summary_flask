@@ -50,6 +50,17 @@
     </select>
 
     <br><br>
+    <div class="mb-3">
+        <label for="dateFilter" class="form-label">Date Filter:</label>
+        <select class="form-select" id="dateFilter" name="date_filter" required>
+            <option value="all" {% if date_filter=='all' %}selected{% endif %}>All</option>
+            <option value="today" {% if date_filter=='today' %}selected{% endif %}>Today</option>
+            <option value="3days" {% if date_filter=='3days' %}selected{% endif %}>Last 3 Days</option>
+            <option value="week" {% if date_filter=='week' %}selected{% endif %}>Last Week</option>
+        </select>
+    </div>
+
+    <br>
     <button type="submit">Search</button>
 </form>
 
@@ -81,11 +92,11 @@
         </div>
     {% endfor %}
 
-    <!-- pagination -->
+    <!-- Pagination -->
     {% if total_pages > 1 %}
         <div class="pagination">
             {% if page > 1 %}
-                <a href="?page={{ page-1 }}&mode={{ mode }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}">&laquo; Prev</a>
+                <a href="?page={{ page-1 }}&mode={{ mode }}&date_filter={{ date_filter }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}">&laquo; Prev</a>
             {% endif %}
 
             {% set displayed_pages = [] %}
@@ -107,7 +118,7 @@
                 {% if p - last_page > 1 %}
                     ...
                 {% endif %}
-                <a href="?page={{ p }}&mode={{ mode }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}"
+                <a href="?page={{ p }}&mode={{ mode }}&date_filter={{ date_filter }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}"
                 {% if p == page %} class="current"{% endif %}>
                     {{ p }}
                 </a>
@@ -115,12 +126,10 @@
             {% endfor %}
 
             {% if page < total_pages %}
-                <a href="?page={{ page+1 }}&mode={{ mode }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}">Next &raquo;</a>
+                <a href="?page={{ page+1 }}&mode={{ mode }}&date_filter={{ date_filter }}{% for kw in selected_keywords %}&keywords={{ kw }}{% endfor %}">Next &raquo;</a>
             {% endif %}
         </div>
     {% endif %}
-
-
 
 {% elif mode=="keyword" %}
     <p>No articles found for selected keywords: {{ selected_keywords | join(", ") }}</p>

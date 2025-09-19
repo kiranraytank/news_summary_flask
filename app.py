@@ -7,6 +7,7 @@ import nltk
 from nltk.corpus import stopwords
 import re
 from markupsafe import Markup
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -15,7 +16,6 @@ try:
     stopwords.words('english')
 except LookupError:
     nltk.download('stopwords')
-
 
 def highlight_keywords(text, keywords):
     if not text or not keywords:
@@ -37,17 +37,17 @@ def index():
     if request.method == 'POST':
         mode = request.form.get("mode", "all")
         selected_keywords = request.form.getlist("keywords")
+        date_filter = request.form.get("date_filter", "all")
     else:
         mode = request.args.get("mode", "all")
         selected_keywords = request.args.getlist("keywords")
+        date_filter = request.args.get("date_filter", "all")
 
     # fetch + filter your articles here using mode and selected_keywords
-
-    # fetch all articles (filtered if keyword mode)
     if mode == 'all':
-        all_articles = fetch_filtered_articles()
+        all_articles = fetch_filtered_articles(date_filter=date_filter)
     else:
-        all_articles = fetch_filtered_articles(selected_keywords)
+        all_articles = fetch_filtered_articles(selected_keywords, date_filter=date_filter)
 
     total_articles = len(all_articles)
     total_pages = ceil(total_articles / per_page)
@@ -73,6 +73,7 @@ def index():
         tags_list=tags_list,
         mode=mode,
         selected_keywords=selected_keywords,
+        date_filter=date_filter,
         zip=zip,
         page=page,
         total_pages=total_pages
